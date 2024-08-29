@@ -98,7 +98,7 @@ fn print_platform(platform: &Vec<Vec<char>>) {
 
 fn main() {
     let mut platform = get_input("input.txt");
-    print_platform(&platform);
+    //print_platform(&platform);
 
     tilt_north(&mut platform);
     
