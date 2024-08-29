@@ -1,5 +1,10 @@
 use std::fs::read_to_string;
 
+mod north;
+mod west;
+mod south;
+mod east;
+
 fn get_input(file_name:&str) -> Vec<Vec<char>> {
     let mut file_lines = Vec::new();
 
@@ -25,49 +30,12 @@ fn get_input(file_name:&str) -> Vec<Vec<char>> {
     result
 }
 
-fn move_rock_north(platform: &mut Vec<Vec<char>>, row: usize, col: usize) {
-    // Algorithm:
-    // 1. Check if the rock can be moved up
-    // 2. If it can, move it up
-    // 3. If it can't, do nothing
-    // 4. Repeat until rock is stopped 
-
-    let mut row = row;
-    let col = col;
-
-    while row > 0 {
-        if platform[row - 1][col] == '.' {
-            platform[row - 1][col] = 'O';
-            platform[row][col] = '.';
-            row -= 1;
-        } else {
-            break;
-        }
-    }
-}
-
-// Tilt the platform to the north so all chars fall to top in accordance with problem statement
-fn tilt_north(platform: &mut Vec<Vec<char>>) {
-    // Algorithm:
-    // 1. Iterate over each row
-    // 2. Iterate over each item in row, if item is a O, move it up until it hits a wall or another
-    //    O or the top of the platform
-    // 3. Repeat until all items are moved up
-    
-    let platform_clone = platform.clone();
-    let mut row_num: usize = 0;
-    
-    for row in platform_clone {
-        let mut col_num: usize = 0;
-        for i in row {
-            if i == 'O' {
-               move_rock_north(platform, row_num, col_num);
-            }
-            col_num += 1;
-        }
-
-        row_num += 1;
-    }
+fn cycle_platform(platform: &mut Vec<Vec<char>>) {
+    // 1 Cycle = 1 tilt_north + 1 tilt_west + 1 tilt_south + 1 tilt_east
+    north::tilt_north(platform);
+    west::tilt_west(platform);
+    south::tilt_south(platform);
+    east::tilt_east(platform);
 }
 
 fn count_load(platform: &Vec<Vec<char>>) -> usize {
@@ -97,12 +65,12 @@ fn print_platform(platform: &Vec<Vec<char>>) {
 }
 
 fn main() {
-    let mut platform = get_input("input.txt");
-    //print_platform(&platform);
-
-    tilt_north(&mut platform);
+    let mut platform = get_input("input_small.txt");
     
-    print_platform(&platform);
+    for i in 0..1000000000 {
+        cycle_platform(&mut platform);
+        print!("Finished cycle: {}\r", i);
+    }
 
     println!("Total load: {}", count_load(&platform));
 }
